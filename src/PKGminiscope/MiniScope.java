@@ -1,4 +1,17 @@
 package REMtracker.src.PKGminiscope;
+
+import javafx.geometry.Dimension2D;
+import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderWidths;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+
 /**
  * MiniScope instantiates other framework classes such as:
  * (MiniScopeDataModel, MiniScopeTimerTask, Channel & MiniScopeEventRelayer)
@@ -15,8 +28,10 @@ package REMtracker.src.PKGminiscope;
 public class MiniScope {
     
     //Global Variables
+    Stage primaryStage;
     String appName;
     double version;
+    BorderPane rootLayout;
     MiniScopeDataModel miniScopeDataModel;
     MiniScopeTimerTask miniScopeTimerTask;
     MiniScopeEventRelayer miniScopeEventRelayer;
@@ -27,22 +42,38 @@ public class MiniScope {
     //Constructor with no arguments
     public MiniScope(){}
 
-    //Constructor with arguments instantiating associative classes
-    public MiniScope(String theAppName, double theVersion){
+
+    public MiniScope(String theAppName, double theVersion, Stage aStage){
         this.appName = theAppName;
         this.version = theVersion;
-        miniScopeDataModel = new MiniScopeDataModel();
+        this.primaryStage = aStage;
+        rootLayout = new BorderPane();
+
+        miniScopeDataModel = new MiniScopeDataModel(this.primaryStage, this.rootLayout);
         miniScopeTimerTask = new MiniScopeTimerTask();
         miniScopeEventRelayer = new MiniScopeEventRelayer();
         scopeChannel = new Channel();
+
+        setStage();
     }
-    
-    //setGUI sets a default GUI by using the data from miniScopeDataModel
-    //Should REMtracker edit the GUI? NO for now - it should however display it
-    //This GUI should leave left, right, top & bottom border blank for REMtracker to fill
-    public void setGUI(){}
-    
-    
+
+    //setStage sets a scene with a pane layout and scene dimensions
+    public void setStage(){
+        double scaleValue = 0.95;
+        double sceneWidth = getScreenDimensions().getWidth() * scaleValue;
+        double sceneHeight = getScreenDimensions().getHeight() * scaleValue;
+
+        primaryStage.setTitle(appName + " " + version);
+        primaryStage.setResizable(false);
+        primaryStage.setScene(new Scene(rootLayout, sceneWidth, sceneHeight));
+        primaryStage.show();
+    }
+
+    //Getting Screen Dimensions
+    public Rectangle2D getScreenDimensions(){
+        return new Rectangle2D(0,0,Screen.getPrimary().getVisualBounds().getWidth(),
+                                               Screen.getPrimary().getVisualBounds().getHeight());
+    }
     
     
  
